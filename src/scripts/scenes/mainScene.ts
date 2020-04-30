@@ -1,5 +1,8 @@
 import { Scene3D } from '@enable3d/phaser-extension'
 import { SoundManager } from "../soundManager"
+import { Path } from "../generators/path"
+import { PathPath } from "../generators/pathPath"
+import { THREE } from '@enable3d/phaser-extension'
 
 export default class MainScene extends Scene3D {
   camerasArr
@@ -28,11 +31,147 @@ export default class MainScene extends Scene3D {
     this.accessThirdDimension()
     this.third.warpSpeed('camera', 'ground', 'grid', 'light', 'sky')
     this.third.camera.position.set(10, 10, 20)
+    
+    // this.third.add(new THREE.HemisphereLight(0xffffbb, 0x080820, 1))
 
+    
     // this.third.physics.debug.enable()
 
     // add player
     // @ts-ignore
+    
+    // i like this one https://threejs.org/examples/#webgl_buffergeometry
+      
+    let triangles = 16000;
+
+		let geometry = new THREE.BufferGeometry();
+
+		let positions = [] as  any
+		let normals = [] as any
+		let colors = [] as any
+
+		let color = new THREE.Color();
+
+		let n = 800, n2 = n / 2;	// triangles spread in the cube
+		let d = 6, d2 = d / 2;	// individual triangle size
+
+		let pA = new THREE.Vector3();
+		let pB = new THREE.Vector3();
+		let pC = new THREE.Vector3();
+
+		let cb = new THREE.Vector3();
+		let ab = new THREE.Vector3();
+
+		for ( let i = 0; i < triangles; i ++ ) {
+
+			// positions
+
+			let x = Math.random() * n - n2;
+			let y = Math.random() * n - n2;
+			let z = Math.random() * n - n2;
+
+			let ax = x + Math.random() * d - d2;
+			let ay = y + Math.random() * d - d2;
+			let az = z + Math.random() * d - d2;
+
+			let bx = x + Math.random() * d - d2;
+			let by = y + Math.random() * d - d2;
+			let bz = z + Math.random() * d - d2;
+
+			let cx = x + Math.random() * d - d2;
+			let cy = y + Math.random() * d - d2;
+			let cz = z + Math.random() * d - d2;
+
+			positions.push( ax, ay, az );
+			positions.push( bx, by, bz );
+			positions.push( cx, cy, cz );
+
+			// flat face normals
+
+			pA.set( ax, ay, az );
+			pB.set( bx, by, bz );
+			pC.set( cx, cy, cz );
+
+			cb.subVectors( pC, pB );
+			ab.subVectors( pA, pB );
+			cb.cross( ab );
+
+			cb.normalize();
+
+			let nx = cb.x;
+			let ny = cb.y;
+			let nz = cb.z;
+
+			normals.push( nx, ny, nz );
+			normals.push( nx, ny, nz );
+			normals.push( nx, ny, nz );
+
+			// colors
+
+			let vx = ( x / n ) + 0.5;
+			let vy = ( y / n ) + 0.5;
+			let vz = ( z / n ) + 0.5;
+
+			color.setRGB( vx, vy, vz );
+
+			colors.push( color.r, color.g, color.b );
+			colors.push( color.r, color.g, color.b );
+			colors.push( color.r, color.g, color.b );
+
+		}
+
+		function disposeArray() {
+
+			// this.array = null;
+
+		}
+
+		geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ).onUpload( disposeArray ) );
+		geometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ).onUpload( disposeArray ) );
+		geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ).onUpload( disposeArray ) );
+
+		geometry.computeBoundingSphere();
+
+		let material = new THREE.MeshPhongMaterial( {
+			color: 0xaaaaaa, specular: 0xffffff, shininess: 250,
+			side: THREE.DoubleSide
+		} );
+
+		let mesh = new THREE.Mesh( geometry, material );
+    this.third.add.existing( mesh )
+    
+    // end test
+    
+    let pathx = new Path(5);
+    pathx.position.set(-2, 0, 2)
+    this.third.add.existing(pathx)
+    //path.shape = 'box'
+    // this.third.physics.add.existing(pathx)
+    
+    let path2 = new PathPath(20);
+    path2.path.position.set(2, 0, 2)
+    this.third.add.existing(path2.path)
+    this.third.physics.add.existing(path2.path)
+    path2.path.body.setCollisionFlags(2)
+    /*
+    cube.position.set(0, 5, 0)
+
+          // We set shape manually to 'box' that enable3d is aware of the shape
+          cube.shape = 'box'
+
+          // Add cube to the scene
+          this.third.add.existing(cube)
+
+          // Add physics to the cube
+          this.third.physics.add.existing(cube)
+    */
+    
+    // path.body.setCollisionFlags(2)
+
+    // this.box = Scene3D.third.make.box({ x: 0.75, y: 1.75, z: -0.25 })
+    // this.box.position.set(0, 0, 0)
+
+    
     this.player = this.third.new.group()
     this.player.position.setY(2)
     const body = this.third.add.box({ height: 0.8, y: 1, width: 0.4, depth: 0.4 }, { lambert: { color: 0xff0000 } })
