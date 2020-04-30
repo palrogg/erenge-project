@@ -1,6 +1,6 @@
 # Erenge Project
 
-A pseudo-randomly generated game using Yannick Deubel’s 3d phaser template (a clone of [phaser-project-template](https://github.com/yandeu/phaser-project-template), which includes enable3d.io).
+A pseudo-randomly generated game using Yannick Deubel’s [3d phaser template](https://github.com/yandeu/phaser-project-template) (a clone of [phaser-project-template](https://github.com/yandeu/phaser-project-template), which includes enable3d.io).
 
 ## Build and run
 
