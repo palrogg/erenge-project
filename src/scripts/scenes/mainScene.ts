@@ -1,5 +1,6 @@
 import { Scene3D } from '@enable3d/phaser-extension'
 import { SoundManager } from "../soundManager"
+import { EventManager } from "../eventManager"
 import { Path } from "../generators/path"
 import { PathPath } from "../generators/pathPath"
 import { THREE } from '@enable3d/phaser-extension'
@@ -11,6 +12,9 @@ export default class MainScene extends Scene3D {
   keys
   player
   soundManager
+  eventManager
+  eventEmitter
+  eventDispatch
 
   constructor() {
     super({ key: 'MainScene' })
@@ -22,15 +26,24 @@ export default class MainScene extends Scene3D {
     this.cameraIndex = 0
     this.canCameraMove = true
     this.soundManager = new SoundManager("main")
-
+    this.eventEmitter = this.events
+    this.eventManager = new EventManager("main", this.eventEmitter)
+    
     delete this.keys
     delete this.player
   }
-
+  
+  userInput(argument){
+    console.log(argument)
+  }
+  
   create() {
     this.accessThirdDimension()
     this.third.warpSpeed('camera', 'ground', 'grid', 'light', 'sky')
     this.third.camera.position.set(10, 10, 20)
+    
+    this.eventEmitter.on('input', this.userInput);
+    
     
     // this.third.add(new THREE.HemisphereLight(0xffffbb, 0x080820, 1))
 
@@ -239,10 +252,26 @@ export default class MainScene extends Scene3D {
       s: this.input.keyboard.addKey('s'),
       space: this.input.keyboard.addKey(32)
     }
-    // this.third.haveSomeFun()
+    this.eventManager.addKeys(this.keys);
   }
   
   triggerSound(timeout){
+    
+  }
+  
+  move(speed, direction){
+    const rotation = this.player.getWorldDirection(this.player.rotation.toVector3())
+    const theta = Math.atan2(rotation.x, rotation.z)
+    
+    const x = Math.sin(theta) * speed,
+      y = this.player.body.velocity.y,
+      z = Math.cos(theta) * speed
+
+    this.player.body.setVelocity(x, y, z)
+    
+  }
+  
+  rotate(speed, direction){
     
   }
   
@@ -252,7 +281,9 @@ export default class MainScene extends Scene3D {
     this.third.camera.lookAt(pos.x, pos.y + 3, pos.z)
 
     if (pos.y < -20) this.scene.restart()
-
+    
+    this.eventManager.getKeyEvents();
+    
     if (this.keys.space.isDown) {
       if (this.canCameraMove) {
         this.canCameraMove = false
@@ -264,17 +295,9 @@ export default class MainScene extends Scene3D {
       }
     }
     if (this.keys.w.isDown) {
-      this.soundManager.synthOn();
+      this.soundManager.synthOn()
+      this.move(4, 'forward')
       
-      const speed = 4
-      const rotation = this.player.getWorldDirection(this.player.rotation.toVector3())
-      const theta = Math.atan2(rotation.x, rotation.z)
-
-      const x = Math.sin(theta) * speed,
-        y = this.player.body.velocity.y,
-        z = Math.cos(theta) * speed
-
-      this.player.body.setVelocity(x, y, z)
     }else{
       this.soundManager.synthOff()
     }
