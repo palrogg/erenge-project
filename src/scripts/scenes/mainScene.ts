@@ -3,6 +3,7 @@ import { SoundManager } from "../soundManager"
 import { EventManager } from "../eventManager"
 import { Path } from "../generators/path"
 import { PathPath } from "../generators/pathPath"
+import { Maze } from "../generators/maze"
 import { THREE } from '@enable3d/phaser-extension'
 
 export default class MainScene extends Scene3D {
@@ -38,21 +39,76 @@ export default class MainScene extends Scene3D {
   }
   
   create() {
+    // const scene = new THREE.scene()
+    // scene.background = new THREE.Color(0xf0f0f0)
+    
     this.accessThirdDimension()
     this.third.warpSpeed('camera', 'ground', 'grid', 'light', 'sky')
     this.third.camera.position.set(10, 10, 20)
     
-    this.eventEmitter.on('input', this.userInput);
     
+    this.eventEmitter.on('input', this.userInput)
+    
+    // Add maze -- test, not optimzed
+    const maze = new Maze()
+    let mazeGroup = this.third.new.group()
+    
+    /*
+    const body = this.third.add.box({ height: 0.8, y: 1, width: 0.4, depth: 0.4 }, { lambert: { color: 0xff0000 } })
+    const head = this.third.add.sphere({ radius: 0.4, y: 2.0, z: 0.05 }, { lambert: { color: 0xff0000 } })
+    this.player.add(body, head)
+    this.third.add.existing(this.player)
+
+    
+    */
+    
+    const cellSize = 4
+    const cellHeight = 10
+    const wallThickness = 0.1
+    console.log(maze)
+    
+    let theScene = this;
+    maze.cells.forEach(function(row){
+      row.forEach(function(cell){
+        console.log(cell)
+        
+        let floor = theScene.third.physics.add.box({ x: cell.x * cellSize, y: 0, z: cell.y * cellSize, width: cellSize*.95, height: 0.1, depth: cellSize*.95 }, { lambert: { color: 0x0000ff } })
+        floor.body.setCollisionFlags(2)
+        mazeGroup.add(floor)
+        
+        if(cell.left){
+          let wallEdge = (cell.y * cellSize) + (cellSize/2) - wallThickness
+          let wallCenter = (cell.x * cellSize)
+          
+          let wall = theScene.third.physics.add.box({ x: wallCenter, y: 0.2, z: wallEdge, width: cellSize, height: cellHeight, depth: 0.1 }, { lambert: { color: 0x00ff00, transparent: true, opacity: 0.5  } })
+          wall.body.setCollisionFlags(2)
+          mazeGroup.add(wall)
+        }
+        if(cell.top){
+          let wallEdge = (cell.x * cellSize) + (cellSize/2) - wallThickness
+          let wallCenter = (cell.y * cellSize)
+          
+          
+          let wall = theScene.third.physics.add.box({ x: wallEdge, y: 0.2, z: wallCenter, width: 0.1, height: cellHeight, depth: cellSize }, { lambert: { color: 0x00fff0, transparent: true, opacity: 0.5  } })
+          wall.body.setCollisionFlags(2)
+          mazeGroup.add(wall)
+        }
+        
+        
+        // let floor = this.third.make.box({ x: cellSize, y: 0.2, z: cellSize })
+        // floor.position.set(cell.x, 0.2, cell.y)
+        
+        // let wall = Scene3D.third.make.box({ x: 0.75, y: 1.75, z: -0.25 })
+        // wall.position.set(cell.x, cell.y, 0)
+        
+      })
+    })
+    this.third.add.existing(mazeGroup)
+
     
     // this.third.add(new THREE.HemisphereLight(0xffffbb, 0x080820, 1))
-
-    
     // this.third.physics.debug.enable()
 
-    // add player
-    // @ts-ignore
-    
     // i like this one https://threejs.org/examples/#webgl_buffergeometry
       
     let triangles = 16000;
@@ -155,17 +211,17 @@ export default class MainScene extends Scene3D {
     
     // end test
     
-    let pathx = new Path(5);
+    /*let pathx = new Path(5);
     pathx.position.set(-2, 0, 2)
     this.third.add.existing(pathx)
     //path.shape = 'box'
     // this.third.physics.add.existing(pathx)
     
     let path2 = new PathPath(20);
-    path2.path.position.set(2, 0, 2)
+    path2.path.position.set(10, 0, 2)
     this.third.add.existing(path2.path)
     this.third.physics.add.existing(path2.path)
-    path2.path.body.setCollisionFlags(2)
+    path2.path.body.setCollisionFlags(2)*/
     /*
     cube.position.set(0, 5, 0)
 
@@ -228,13 +284,13 @@ export default class MainScene extends Scene3D {
 
     this.third.warpSpeed()
 
-    const redBox = this.third.physics.add.box({ name: 'redBox', y: 10, z: 2.5, width: 2, height: 2 }, { lambert: { color: 0xff0000 } })
+    /*const redBox = this.third.physics.add.box({ name: 'redBox', y: 10, z: 2.5, width: 2, height: 2 }, { lambert: { color: 0xff0000 } })
     const blueBox = this.third.physics.add.box({ name: 'blueBox', x: 0.5, y: 15, z: 2.1, depth: 3 }, { lambert: { color: 0x0000ff } })
     const greenBox = this.third.physics.add.box({ name: 'greenBox', x: 1, y: 20, depth: 2, height: 2 }, { lambert: { color: 0x00ff00 } })
 
     this.third.physics.add.collider(redBox, greenBox, event => {
       console.log(`redBox and greenBox: ${event}`)
-    })
+    })*/
 
     /*blueBox.body.on.collision((otherObject, event) => {
       if (otherObject.name === 'ground') console.log(`blueBox and ${otherObject.name}: ${event}`)

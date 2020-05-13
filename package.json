@@ -55,6 +55,7 @@
   },
   "dependencies": {
     "@enable3d/phaser-extension": "0.0.16-alpha.0",
+    "generate-maze": "^0.2.0",
     "phaser": "^3.23.0",
     "strongly-typed-events": "^1.6.11",
     "tone": "^13.8.25"
