@@ -40,14 +40,14 @@
     "@babel/preset-typescript": "^7.9.0",
     "@types/jest": "^25.2.1",
     "clean-webpack-plugin": "^3.0.0",
-    "copy-webpack-plugin": "^5.1.1",
-    "html-webpack-plugin": "^3.2.0",
+    "copy-webpack-plugin": "^11.0.0",
+    "html-webpack-plugin": "^5.5.0",
     "jest": "^25.5.3",
     "ts-jest": "^25.4.0",
-    "ts-loader": "^5.4.5",
+    "ts-loader": "^9.4.2",
     "typescript": "^3.8.3",
-    "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.11",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1",
     "webpack-dev-server": "^3.10.3",
     "webpack-merge": "^4.2.2",
     "webpack-obfuscator": "^0.28.0",
@@ -56,7 +56,7 @@
   "dependencies": {
     "@enable3d/phaser-extension": "0.0.16-alpha.0",
     "generate-maze": "^0.2.0",
-    "phaser": "^3.23.0",
+    "phaser": "^3.55.2",
     "strongly-typed-events": "^1.6.11",
     "tone": "^13.8.25"
   }
